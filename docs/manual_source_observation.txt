@@ -1,0 +1,10 @@
+Local-only manual source observation
+ROM MD5 verified: e26ee0d44e809351c8ce2d73c7400cdd
+FireRed map context: LAYOUT_PALLET_TOWN (General + PalletTown)
+Layout dimensions: 24x20
+Source layout cell: 2,2
+Map entry: 0x32A6
+Resolved source metatile: PalletTown secondary / raw ID 678 / local ID 38
+General decoded tiles: 640
+PalletTown decoded tiles: 76
+Rendered output was viewed locally only and deleted after the manual workflow observation.

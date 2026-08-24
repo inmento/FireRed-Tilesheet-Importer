@@ -1,0 +1,20 @@
+# Player-provided ROM sources
+*.gba
+*.gb
+*.gbc
+
+# Never retain or publish extracted/generated visual source material
+*.png
+*.gif
+*.bmp
+*.webp
+*.jpg
+*.jpeg
+*.aseprite
+*.psd
+
+# Local inspection and packaging workspaces
+/tmp/
+/out/
+/.cache/
+*.log
