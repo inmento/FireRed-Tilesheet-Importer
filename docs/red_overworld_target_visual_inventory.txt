@@ -1,0 +1,17 @@
+Private target-sheet visual inventory
+
+Source: a temporary user-provided Gen1Recomp Red OVERWORLD reference sheet, inspected locally and not retained in the project.
+
+Observed native 8x8 visual categories in the 16-by-6 target grid:
+- repeating natural terrain texture and terrain-edge cells;
+- tree, bush, rock, and other outdoor border/detail cells;
+- building roof, wall, window, trim, and doorway cells;
+- water and shoreline-style cells;
+- fence, sign, and small outdoor prop cells;
+- Pokémon Center / Poké Mart lettering and façade-specific building details.
+
+Mapping consequence: repeating terrain cells are the first plausible direct FireRed-import candidates. Building façade, text/sign, door, and small-prop cells need context-specific review because a single existing target slot can be reused in several block rows and may have no one-to-one FireRed counterpart. Water/flower animation slots remain constrained by existing renderer animation behavior.
+
+A labeled private slot review confirmed that the 96-slot grid intermixes repeating terrain with building façade fragments, entrance-related art, lettering/sign fragments, and small props. This reinforces the existing technical classifications: tile `82` is the grass proof; tiles `27` and `88` require door/warp alignment review; and tiles `3` and `20` remain animation-constrained.
+
+Temporary sheet references used for this inspection were deleted after the audit; no target or FireRed image asset is stored in this repository.
