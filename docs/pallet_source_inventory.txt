@@ -1,0 +1,8 @@
+Local-only FireRed Pallet source inventory
+Source: verified FireRed English v1.0; no source image is retained.
+Layout: 24x20 FireRed metatiles; 98 distinct metatile IDs used.
+Primary General metatiles used (24): 2 3 4 8 9 14 15 17 20 21 22 23 28 29 30 31 36 37 38 39 291 298 299 300
+Secondary PalletTown metatiles used (74): 1 2 3 4 5 6 7 8 9 10 11 12 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 30 31 32 33 34 35 36 37 38 39 40 41 44 45 46 47 48 49 51 52 53 54 56 57 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 75 76 77 78 80 81 82 88
+General raw 8x8 graphics available: 640; PalletTown raw 8x8 graphics available: 76.
+A temporary local map render was inspected and deleted; no artwork is stored in the project.
+Visual category observation from that local render: the Pallet source contains repeating grass/ground texture, border trees, path edges, house roof/wall/window/door pieces, fences/signs/flowers, water and shoreline pieces, and map-specific laboratory/building details. This confirms FireRed source categories for many outdoor visuals, but does not establish a one-to-one target-slot mapping; each still needs compatibility review against the unchanged Red OVERWORLD slot reuse sets.
