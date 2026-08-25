@@ -1,9 +1,9 @@
--- Verified-ROM FireRed 8×8 source decoder for the tilesheet-first proof.
+-- Verified-ROM FireRed 8×8 source decoder for the tilesheet-first prototype.
 --
--- It resolves FireRed's raw 4bpp tiles through the selected map layout,
--- primary/secondary tilesets, metatile entries, palettes, flips, and two visual
--- layers. Its only output is a native 8×8 pixel function for a ledger-approved
--- existing Gen 1 target tile slot.
+-- It resolves FireRed raw 4bpp graphics through a ledger-declared source map
+-- layout, primary/secondary tilesets, metatile entries, palettes, flips, and
+-- two visual layers. Its only output is one native 8×8 pixel write to an
+-- explicitly approved existing Gen 1 target tile slot.
 
 local Reader = require("mods.FIRERED_TILESET_SHEET_PROTOTYPE.lib.reader")
 local Lz77 = require("mods.FIRERED_TILESET_SHEET_PROTOTYPE.lib.lz77")
@@ -43,7 +43,7 @@ local function decodeHeader(reader, address, expectedSecondary, paletteCount, la
   if compressed then
     tiles = Lz77.decode(reader, tilesOffset, label .. " tiles")
   else
-    fail(label .. " uses unsupported uncompressed tiles for this narrow proof")
+    fail(label .. " uses unsupported uncompressed tiles for this narrow prototype")
   end
   if #tiles < TILE_BYTES or #tiles % TILE_BYTES ~= 0 then
     fail(label .. " decoded to an invalid 4bpp tile sheet")
@@ -77,27 +77,36 @@ local function entryParts(value)
   }
 end
 
-local function decodeLayout(reader, plan)
-  local layout = plan.palletLayout
-  local offset = reader:offset(layout.address, "Pallet Town layout")
-  local width, height = reader:u32(offset, "Pallet Town width"), reader:u32(offset + 4, "Pallet Town height")
+local function decodeLayout(reader, revision, layoutKey)
+  local layout = revision.layouts and revision.layouts[layoutKey]
+  if type(layout) ~= "table" then fail("approved source layout '" .. tostring(layoutKey) .. "' is unavailable") end
+  local label = layout.label or layoutKey
+  local offset = reader:offset(layout.address, label .. " layout")
+  local width, height = reader:u32(offset, label .. " width"), reader:u32(offset + 4, label .. " height")
   if width ~= layout.width or height ~= layout.height then
-    fail("Pallet Town layout dimensions do not match the approved ledger")
+    fail(label .. " layout dimensions do not match the approved ledger")
   end
-  local mapAddress = reader:u32(offset + 12, "Pallet Town map block pointer")
-  local primaryHeader = reader:u32(offset + 16, "Pallet Town primary tileset pointer")
-  local secondaryHeader = reader:u32(offset + 20, "Pallet Town secondary tileset pointer")
+  local mapAddress = reader:u32(offset + 12, label .. " map block pointer")
+  local primaryHeader = reader:u32(offset + 16, label .. " primary tileset pointer")
+  local secondaryHeader = reader:u32(offset + 20, label .. " secondary tileset pointer")
   if primaryHeader ~= layout.primaryHeader or secondaryHeader ~= layout.secondaryHeader then
-    fail("Pallet Town tileset pairing does not match the approved ledger")
+    fail(label .. " tileset pairing does not match the approved ledger")
   end
-  return { width = width, height = height, mapOffset = reader:offset(mapAddress, "Pallet Town block data") }
+  return {
+    width = width,
+    height = height,
+    mapOffset = reader:offset(mapAddress, label .. " block data"),
+    label = label,
+    primaryHeader = primaryHeader,
+    secondaryHeader = secondaryHeader,
+  }
 end
 
 local function layoutEntry(reader, layout, x, y)
   if x < 0 or y < 0 or x >= layout.width or y >= layout.height then
-    fail("approved source cell is outside the declared FireRed layout")
+    fail("approved source cell is outside the declared " .. layout.label .. " layout")
   end
-  return reader:u16(layout.mapOffset + (y * layout.width + x) * 2, "Pallet Town map entry")
+  return reader:u16(layout.mapOffset + (y * layout.width + x) * 2, layout.label .. " map entry")
 end
 
 local function metatileBank(primary, secondary, mapEntry)
@@ -113,8 +122,8 @@ end
 
 local function tileColor(primary, secondary, tileId, x, y)
   -- FireRed stores primary graphics in VRAM slots 0..639 and secondary
-  -- graphics after them. Palette selection is a separate metatile-entry field;
-  -- it must not decide which raw graphics bank the tile reference reads from.
+  -- graphics after them. Palette selection is separate from graphics-bank
+  -- selection and must not be used as a bank selector.
   local bank, localTile
   if tileId < PRIMARY_METATILES then
     bank, localTile = primary, tileId
@@ -131,9 +140,8 @@ end
 
 -- The runtime plan is a safety boundary, not just a convenience list. Each
 -- target tile must have a separate approval record explaining why its complete
--- unchanged Gen 1 reuse set accepts one FireRed 8×8 visual. This keeps a
--- future broad importer from treating nearby source cells as an automatic
--- 16×16-to-8×8 remap.
+-- unchanged Gen 1 reuse set accepts one FireRed 8×8 visual. This prevents a
+-- broad importer from treating nearby source cells as an automatic remap.
 local function validateLedger(base, tilesetPlan)
   if type(tilesetPlan) ~= "table" or type(tilesetPlan.writes) ~= "table" then
     fail("the target tileset has no approved source ledger")
@@ -214,22 +222,28 @@ function Decoder.buildSheet(rom, base, revision, tilesetPlan, baseImageData)
   validateLedger(base, tilesetPlan)
 
   local reader = Reader.new(rom, revision.romBase)
-  local primary = decodeHeader(reader, revision.headers.general, false, PRIMARY_PALETTES, "General")
-  local secondary = decodeHeader(reader, revision.headers.palletTown, true, 16, "Pallet Town")
-  primary._reader, secondary._reader = reader, reader
-  local layout = decodeLayout(reader, revision)
-  local sheet = Patch.cloneBase(base, baseImageData)
+  local contexts = {}
+  local function context(layoutKey)
+    if contexts[layoutKey] then return contexts[layoutKey] end
+    local layout = decodeLayout(reader, revision, layoutKey)
+    local primary = decodeHeader(reader, layout.primaryHeader, false, PRIMARY_PALETTES, layout.label .. " primary")
+    local secondary = decodeHeader(reader, layout.secondaryHeader, true, 16, layout.label .. " secondary")
+    primary._reader, secondary._reader = reader, reader
+    contexts[layoutKey] = { layout = layout, primary = primary, secondary = secondary }
+    return contexts[layoutKey]
+  end
 
+  local sheet = Patch.cloneBase(base, baseImageData)
   for _, write in ipairs(tilesetPlan.writes) do
     local source = write.source
-    if source.layout ~= "palletTown" then fail("the narrow proof supports only the declared Pallet layout") end
-    local mapEntry = layoutEntry(reader, layout, source.x, source.y)
+    local active = context(source.layout)
+    local mapEntry = layoutEntry(reader, active.layout, source.x, source.y)
     if mapEntry ~= source.expectedMapEntry then fail("source map entry does not match the approved ledger") end
-    local bank, metatileId, bankName = metatileBank(primary, secondary, mapEntry)
+    local bank, metatileId, bankName = metatileBank(active.primary, active.secondary, mapEntry)
     if bankName ~= source.expectedBank or metatileId ~= source.expectedMetatile then
       fail("source metatile does not match the approved ledger")
     end
-    local pixels = resolveCell(primary, secondary, bank, metatileId, source.cell)
+    local pixels = resolveCell(active.primary, active.secondary, bank, metatileId, source.cell)
     Patch.writeTile(base, sheet, write.targetTile, function(x, y)
       local pixel = pixels[y * 8 + x + 1]
       return pixel[1], pixel[2], pixel[3], pixel[4]

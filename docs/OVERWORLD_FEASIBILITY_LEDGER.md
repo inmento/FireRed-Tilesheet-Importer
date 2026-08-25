@@ -8,7 +8,7 @@ This is an evidence-based **first-pass constraint ledger**, not a claim that eve
 |---:|---|---|---|
 | `82` | `grass`, `walkable` | Pallet Town layout cell `(2,2)`, PalletTown secondary metatile `38`, native cell `0` | **Direct import verified** |
 
-Tile `82` is the only slot presently approved for the runtime proof. The source is resolved locally from the player’s verified FireRed ROM; no image asset is stored in the project.
+Within the `OVERWORLD` sheet, tile `82` is the only presently approved runtime slot. Separately, the compatible-interior audit approves Red’s House target slot `1` in both `REDS_HOUSE_1` and `REDS_HOUSE_2`; it is documented in the runtime ledger because it is not an `OVERWORLD` target. Every source is resolved locally from the player’s verified FireRed ROM; no image asset is stored in the project.
 
 ## Slots that are not automatically safe to replace
 
@@ -16,6 +16,7 @@ Tile `82` is the only slot presently approved for the runtime proof. The source 
 |---|---|---|---|
 | Door/warp slots | `27`, `88` | The existing behavior remains correct only if the replacement image still visually reads as a door at the original Gen 1 warp location. | Retain until an explicit visual/position audit is complete. |
 | Water/flower animation slots | `20` water, `3` flower | Red’s `OVERWORLD` animation callback modifies these existing 8×8 slots at runtime. A static imported cell alone is not a complete replacement. | Retain for the baseline; design compatible animation support later if wanted. |
+| Ledge components | `10`, `15`, `16`, `18`, `20`, `23`, `26`, `35`, `44`, `50`, `51`, `64`, `65`, `75`, `78`, `80`, `81`, `83` | Red’s ledge blocks `13`, `29`, `39`, `54`, and `55` reuse every one of these 8×8 components in unrelated `OVERWORLD` block rows. FireRed jump-ledge source metatiles exist, but no one target component is ledge-exclusive. | **Do not map in the image-only importer.** |
 | High-reuse slots | `44` (257 uses / 32 block rows), `20` (184 / 20), `35` (138 / 18), `57` (125 / 17), `17` (108 / 13) | One visual written to the target slot appears everywhere the original block rows reuse it. A source choice must fit every use, not merely one map location. | Require visual reuse audit before mapping. |
 | Other role-bearing active slots | `16`, `32`, `33`, `35`, `44`, `45`, `46`, `48`, `49`, `51`, `57`, `60`, `62`, `84`, `91` | Their existing walkability behavior is preserved by the image-only design, but the replacement must visually agree with the player’s old movement expectations. | Candidate only after explicit visual mapping and play test. |
 | Unused slots | `0`, `94`, `95` | They are not currently drawn by the imported OVERWORLD block rows. | Safe space for future original custom art only if a later block-table project explicitly uses them; irrelevant to the image-only baseline. |

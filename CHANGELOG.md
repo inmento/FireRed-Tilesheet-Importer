@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-prototype.3 — Compatible house-floor proof
+
+This update extends the evidence-backed importer to one additional fully compatible interior visual only. It resolves FireRed Player’s House 1F Building primary metatile `1`, native top-left 8×8 cell, and writes it only to Red’s existing repeated neutral-floor target slot `1` in both `REDS_HOUSE_1` and `REDS_HOUSE_2`. The decoder now supports separately declared, verified FireRed layout contexts while preserving the same target-slot approval guardrail.
+
+The interior scope is deliberately narrow. The approved floor target is used as a neutral floor across the complete unchanged Red’s House reuse set; no stairs, exit mats, doors, furniture, walls, edge tiles, or other interior components are changed. The audited Red ledge components are all shared with unrelated `OVERWORLD` blocks, so **no ledge mapping is included**. Other interior sheets remain unchanged unless their full native reuse set is separately verified compatible.
+
+The patch still supplies image metadata only. It does not alter blocks, map grids, collision, warps, encounters, scripts, saves, or gameplay semantics. No FireRed ROM, extracted graphics, generated image, or downloaded/reposted tilesheet is included in the repository or release package.
+
 ## 0.1.0-prototype.2 — Evidence-backed target-slot ledger
 
 This update applies the current Gen1Recomp tileset-sheet contract to the importer’s runtime mapping boundary. Every proposed FireRed source-to-Red target write must now be explicitly approved for that exact existing 8×8 target slot, include reuse-set evidence, match the approved base role, declare a complete verified source context, remain in the native target-sheet bounds, and occur only once. Invalid entries are rejected before source pixels are decoded or a generated sheet is written.

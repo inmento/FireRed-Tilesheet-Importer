@@ -1,7 +1,7 @@
 {
   "id": "FIRERED_TILESET_SHEET_PROTOTYPE",
   "name": "FireRed Tilesheet Importer Prototype",
-  "version": "0.1.0-prototype.2",
+  "version": "0.1.0-prototype.3",
   "api": 2,
   "entry": "main.lua",
   "profile": "content",
@@ -16,7 +16,7 @@
   "incompatible": [],
   "games": ["gen1"],
   "experimental": true,
-  "description": "Experimental Red-only, tilesheet-first FireRed visual importer with an evidence-backed 8x8 target-slot ledger. It preserves existing Gen 1 map grids, block definitions, and gameplay semantics while generating local visual sheets from a verified FireRed source.",
+  "description": "Experimental Red-only, tilesheet-first FireRed visual importer. It generates only evidence-approved native 8x8 target slots from a verified local FireRed source while preserving existing Gen 1 map grids, block definitions, and gameplay semantics.",
   "required_imports": [
     {
       "id": "firered_rom",
