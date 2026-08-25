@@ -35,6 +35,12 @@ The automation follows the documented image-editor-equivalent process in [MANUAL
 
 The first ledger entry is deliberately narrow: it maps Pallet Town’s locally verified source cell `(2,2)`—secondary metatile `38`, top-left cell—to Red `OVERWORLD` grass tile `82`. It is a visual proof, not a claim that every grass or terrain variant is already mapped.
 
+### Target-slot approval guardrail
+
+Version `0.1.0-prototype.2` makes the mapping ledger an enforced runtime boundary. Every write must name a target slot that is explicitly approved with its reuse-set evidence, use the approved Gen 1 role, provide a complete FireRed source declaration, remain inside the existing 8×8 target-sheet bounds, and appear only once. The decoder rejects an unapproved, duplicate, incomplete, out-of-range, or role-mismatched entry **before it decodes source pixels or writes the generated sheet**.
+
+This implements the engine’s tileset-sheet rule directly: a FireRed 16×16 metatile is only a source convenience; each approved result is one resolved FireRed 8×8 cell written to one existing Gen 1 8×8 slot. The current release still authorizes only target tile `82`; no building, tree, water, door, fence, or neighboring terrain slot was added merely because it appears visually close.
+
 ## Required source and asset boundary
 
 The mod requires the player to import exactly **Pokémon FireRed English v1.0**, 16 MiB, MD5 `e26ee0d44e809351c8ce2d73c7400cdd`, through Gen1Recomp’s protected import flow.
@@ -62,4 +68,4 @@ Verify that the visible grass/ground result is native 8×8 detail rather than 2�
 
 ## Development validation
 
-The project includes tests that verify the 8×8 same-slot contract, the absence of map/block/semantic patch fields, the Red-only entrypoint boundary, and the player-authorized FireRed Pallet source decode. The private verified-ROM test does not emit an image artifact.
+The project includes tests that verify the 8×8 same-slot contract, the enforced target-slot approval ledger, the absence of map/block/semantic patch fields, the Red-only entrypoint boundary, and the player-authorized FireRed Pallet source decode. The private verified-ROM test does not emit an image artifact.

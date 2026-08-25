@@ -129,6 +129,57 @@ local function tileColor(primary, secondary, tileId, x, y)
   return x % 2 == 0 and byte % 16 or math.floor(byte / 16) % 16
 end
 
+-- The runtime plan is a safety boundary, not just a convenience list. Each
+-- target tile must have a separate approval record explaining why its complete
+-- unchanged Gen 1 reuse set accepts one FireRed 8×8 visual. This keeps a
+-- future broad importer from treating nearby source cells as an automatic
+-- 16×16-to-8×8 remap.
+local function validateLedger(base, tilesetPlan)
+  if type(tilesetPlan) ~= "table" or type(tilesetPlan.writes) ~= "table" then
+    fail("the target tileset has no approved source ledger")
+  end
+  if type(tilesetPlan.approvedTargets) ~= "table" then
+    fail("the target tileset has no approved target-slot ledger")
+  end
+
+  local targetCount = Patch.tileCount(base)
+  local seen = {}
+  for index, write in ipairs(tilesetPlan.writes) do
+    if type(write) ~= "table" then fail("ledger write " .. index .. " is invalid") end
+    local target = write.targetTile
+    if type(target) ~= "number" or target % 1 ~= 0 or target < 0 or target >= targetCount then
+      fail("ledger target tile " .. tostring(target) .. " is outside the base sheet")
+    end
+    if seen[target] then fail("ledger writes target tile " .. target .. " more than once") end
+    seen[target] = true
+
+    local approval = tilesetPlan.approvedTargets[target]
+    if type(approval) ~= "table" then
+      fail("ledger target tile " .. target .. " has no explicit target-slot approval")
+    end
+    if type(approval.evidence) ~= "string" or approval.evidence == "" then
+      fail("ledger target tile " .. target .. " has no visual-reuse evidence")
+    end
+    if write.requiredBaseRole ~= approval.requiredBaseRole then
+      fail("ledger target tile " .. target .. " does not match its approved base role")
+    end
+    if write.requiredBaseRole == "grass" and base.grassTile ~= target then
+      fail("approved target tile is no longer the base grass semantic tile")
+    end
+
+    local source = write.source
+    if type(source) ~= "table" then fail("ledger target tile " .. target .. " has no source declaration") end
+    if type(source.layout) ~= "string" or type(source.x) ~= "number" or type(source.y) ~= "number"
+        or type(source.cell) ~= "number" or type(source.expectedMapEntry) ~= "number"
+        or type(source.expectedBank) ~= "string" or type(source.expectedMetatile) ~= "number" then
+      fail("ledger target tile " .. target .. " has an incomplete source declaration")
+    end
+    if source.cell % 1 ~= 0 or source.cell < 0 or source.cell > 3 then
+      fail("ledger target tile " .. target .. " has an invalid 8x8 source cell")
+    end
+  end
+end
+
 local function resolveCell(primary, secondary, tileset, metatileId, cell)
   if cell < 0 or cell > 3 then fail("approved source metatile cell must be 0 through 3") end
   if metatileId < 0 or metatileId >= tileset.metatileCount then
@@ -160,9 +211,7 @@ function Decoder.buildSheet(rom, base, revision, tilesetPlan, baseImageData)
     fail("the verified FireRed source does not have the expected 16 MiB size")
   end
   if rom:byte(0xBD) ~= 0 then fail("only FireRed English v1.0 is supported") end
-  if type(tilesetPlan) ~= "table" or type(tilesetPlan.writes) ~= "table" then
-    fail("the target tileset has no approved source ledger")
-  end
+  validateLedger(base, tilesetPlan)
 
   local reader = Reader.new(rom, revision.romBase)
   local primary = decodeHeader(reader, revision.headers.general, false, PRIMARY_PALETTES, "General")
@@ -172,9 +221,6 @@ function Decoder.buildSheet(rom, base, revision, tilesetPlan, baseImageData)
   local sheet = Patch.cloneBase(base, baseImageData)
 
   for _, write in ipairs(tilesetPlan.writes) do
-    if write.requiredBaseRole == "grass" and base.grassTile ~= write.targetTile then
-      fail("approved target tile is no longer the base grass semantic tile")
-    end
     local source = write.source
     if source.layout ~= "palletTown" then fail("the narrow proof supports only the declared Pallet layout") end
     local mapEntry = layoutEntry(reader, layout, source.x, source.y)
@@ -192,5 +238,7 @@ function Decoder.buildSheet(rom, base, revision, tilesetPlan, baseImageData)
 
   return sheet
 end
+
+Decoder.validateLedger = validateLedger
 
 return Decoder

@@ -26,6 +26,16 @@ Plan.FIRERED_EN_V10 = {
 
 Plan.tilesets = {
   OVERWORLD = {
+    -- Each key is a target 8x8 slot, not a source metatile. A future mapping
+    -- must be added here only after its full unchanged Gen 1 reuse set has a
+    -- recorded visual decision; a nearby FireRed cell is not authorization.
+    approvedTargets = {
+      [82] = {
+        requiredBaseRole = "grass",
+        evidence = "Red OVERWORLD grassTile; all 16 uses occur in one grass block row; FireRed PalletTown secondary metatile 38 cell 0 was locally resolved and compared at native 8x8 geometry.",
+      },
+    },
+
     -- Target tile 82 is Red OVERWORLD's base grassTile. The source was
     -- observed locally only at Pallet layout cell (2,2), which resolves to
     -- secondary metatile 38. Cell 0 is its native top-left 8×8 output cell.
