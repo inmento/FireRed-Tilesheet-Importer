@@ -1,20 +1,28 @@
 {
   "id": "FIRERED_TILESET_SHEET_PROTOTYPE",
   "name": "FireRed Tilesheet Importer Prototype",
-  "version": "0.1.0-prototype.3",
+  "version": "0.1.0-prototype.4",
   "api": 2,
   "entry": "main.lua",
   "profile": "content",
-  "game_version": ">=0.2.24",
+  "game_version": ">=0.2.18",
   "category": "GRAPHICS",
   "priority": 100,
   "github": "inmento/FireRed-Tilesheet-Importer",
-  "permissions": ["engine_internals"],
+  "permissions": [
+    "engine_internals"
+  ],
   "dependencies": [],
   "optional_dependencies": [],
-  "conflicts": ["FIRERED_KANTO_VISUALS", "FIRERED_BROAD_OVERWORLD", "FIRERED_FOLIAGE"],
+  "conflicts": [
+    "FIRERED_KANTO_VISUALS",
+    "FIRERED_BROAD_OVERWORLD",
+    "FIRERED_FOLIAGE"
+  ],
   "incompatible": [],
-  "games": ["gen1"],
+  "games": [
+    "gen1"
+  ],
   "experimental": true,
   "description": "Experimental Red-only, tilesheet-first FireRed visual importer. It generates only evidence-approved native 8x8 target slots from a verified local FireRed source while preserving existing Gen 1 map grids, block definitions, and gameplay semantics.",
   "required_imports": [
@@ -25,7 +33,9 @@
       "file": "firered.gba",
       "format": "raw",
       "size": 16777216,
-      "md5": ["e26ee0d44e809351c8ce2d73c7400cdd"]
+      "md5": [
+        "e26ee0d44e809351c8ce2d73c7400cdd"
+      ]
     }
   ]
 }
