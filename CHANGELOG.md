@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-prototype.4 — Gen1Recomp 0.2.18 compatibility
+
+This is a manifest-only compatibility release. The prototype’s engine floor is now `>=0.2.18`, matching the verified Red/Gold/Silver Gen1Recomp baseline. No mapping, decoding behavior, visual scope, source requirement, asset boundary, or gameplay-semantic rule changed in this release.
+
 ## 0.1.0-prototype.3 — Compatible house-floor proof
 
 This update extends the evidence-backed importer to one additional fully compatible interior visual only. It resolves FireRed Player’s House 1F Building primary metatile `1`, native top-left 8×8 cell, and writes it only to Red’s existing repeated neutral-floor target slot `1` in both `REDS_HOUSE_1` and `REDS_HOUSE_2`. The decoder now supports separately declared, verified FireRed layout contexts while preserving the same target-slot approval guardrail.

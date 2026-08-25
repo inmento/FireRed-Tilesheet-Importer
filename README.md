@@ -45,7 +45,7 @@ These are visual proofs, not a claim that every grass, terrain, building, or int
 
 ### Target-slot approval guardrail
 
-Version `0.1.0-prototype.3` retains the mapping ledger as an enforced runtime boundary. Every write must name a target slot that is explicitly approved with its reuse-set evidence, use the approved Gen 1 role, provide a complete FireRed source declaration, remain inside the existing 8×8 target-sheet bounds, and appear only once. The decoder rejects an unapproved, duplicate, incomplete, out-of-range, or role-mismatched entry **before it decodes source pixels or writes the generated sheet**.
+Version `0.1.0-prototype.4` retains the mapping ledger as an enforced runtime boundary and changes only the supported Gen1Recomp engine floor to `>=0.2.18`. Every write must name a target slot that is explicitly approved with its reuse-set evidence, use the approved Gen 1 role, provide a complete FireRed source declaration, remain inside the existing 8×8 target-sheet bounds, and appear only once. The decoder rejects an unapproved, duplicate, incomplete, out-of-range, or role-mismatched entry **before it decodes source pixels or writes the generated sheet**.
 
 This implements the engine’s tileset-sheet rule directly: a FireRed 16×16 metatile is only a source convenience; each approved result is one resolved FireRed 8×8 cell written to one existing Gen 1 8×8 slot. No building, tree, water, door, fence, stair, furniture, wall edge, or neighboring terrain slot is added merely because it appears visually close.
 
