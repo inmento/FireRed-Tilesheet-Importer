@@ -79,3 +79,7 @@ Verify that the visible grass/ground and house floor use native 8×8 detail rath
 ## Development validation
 
 The project includes tests that verify the 8×8 same-slot contract, the enforced target-slot approval ledger, the absence of map/block/semantic patch fields, the Red-only multi-sheet entrypoint boundary, and the player-authorized FireRed Pallet and Player’s House source decodes. Private verified-ROM tests do not emit an image artifact.
+
+## License
+
+Unless a file or third-party notice says otherwise, this repository's original source code, configuration, tests, and documentation are licensed under the [MIT License](LICENSE). Read [LICENSE_SCOPE.md](LICENSE_SCOPE.md) for attribution guidance and third-party, asset, user-supplied-source, and game-IP boundaries.
