@@ -5,7 +5,7 @@
   "api": 2,
   "entry": "main.lua",
   "profile": "content",
-  "game_version": ">=0.2.18",
+  "game_version": ">=0.3.51",
   "category": "GRAPHICS",
   "priority": 100,
   "github": "inmento/FireRed-Tilesheet-Importer",
